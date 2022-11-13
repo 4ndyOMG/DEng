@@ -45,15 +45,15 @@ This detection is to identify adversaries that have successfully exploited users
 ### Strategy Abstract
 To detect the successful exploitation of MFA Fatigue in Azure AD the analytic counts the number of failed MFA events before successful login. If the amount of fails exceeds the threshold the detection will alert. 
 ### Technical Context
-A user that denies an MFA push notification will generate a single 50074 event regardless of the amount of failures. Failures beyond the single deny are tracked and published within Authentication Details as part of the next event in Azure AD Sign-in logs; this can be either 50140 when show keep user signed in is set to yes; (Azure AD > User Settings> Show Keep user signed in), can also be disabled through conditional access policy under session > Persistent browser session or ResultType 0 when 50140 disabled.
+A user that denies a MFA push notification will generate a single 50074 event regardless of the amount of failures. Failures beyond the single deny are tracked and published within Authentication Details as part of the next event; this can be either 50140 when show keep user signed in is set to yes; (Azure AD > User Settings> Show Keep user signed in), can also be disabled through conditional access policy (session > Persistent browser session) or ResultType 0 when 50140 disabled.
 
-The detection first identifies the CorrelationId of all users that have failed an MFA challenge with ResultType 50074. The detection then joins the CorrelationId, with a join kind of leftsemi, with all users that have received ResultType 0 or 50140. 
+The detection first identifies the CorrelationId of all users that have failed a MFA challenge with ResultType 50074. The detection then joins the CorrelationId, with a join kind of leftsemi, with all users that have received ResultType 0 or 50140. 
 
-The authentication details are the expanded to a line for each event before filtering on only those event that contain MFA Deny. These events are the counted by the CorrelationID before being compared against the threshold.
+The authentication details are then expanded to a line for each event before filtering on only those event that contain MFA Deny. These events are the counted by the CorrelationID before being compared against the threshold.
 
-Please note that the amount of failures events through this expand is expediential. The next event following the failure contains the authentication details of each failure and continues to record each failure until success. For example, an authentication request that passes MFA on the third attempt would generate 5 events in the query above; 1 on the first failure and 2 for the second fail ad 2 again on success (the first failure and the second). An authentication request that passes MFA on the forth attempt would generate 9 events in this analytic.
+Please note that the amount of failures events through this expanded authentication details is expediential. The next event following the failure contains the authentication details of each failure and continues to record each failure until success. For example, an authentication request that passes MFA on the third attempt would generate 5 events; 1 on the first failure and 2 for the second fail and 2 again on success (the first failure and the second). An authentication request that passes MFA on the forth attempt would generate 9 events in this analytic.
 
-The threshold is built by counting the number of events seen with the authentication details that contain MFA denied. The threshold does not expand the events and performs a 1:1 count on the CorrelationId. An average is then taken from the count of failures per CorrelationId over the past  week and used as the threshold. The benefit of a behavioral threshold is that it will move with the users keep the threshold a as low as possible without false positives.
+The threshold is built by counting the number of events seen with the authentication details that contain MFA denied. The threshold does not expand the events and performs a 1:1 count on the CorrelationId. An average is then taken from the count of failures per CorrelationId over the past week and used as the threshold. The benefit of a behavioral threshold is that it will move with the users behaviour keeping the threshold a as low as possible without false positives.
 ### Blind Spots and Assumptions
 It is assumed that the adversary will send all MFA attempts in a single session. 
 ### False Positives
@@ -63,7 +63,7 @@ Validated against basic testing in Azure AD.
 ### Priority
 High
 #### Response
-Confirm user location, IP address, user agent, is this in context with normal user behavior? If deemed a true positive immediately reset user password and remove all user sessions. Enable number matching for MFA to mitigate this vulnerability.
+Confirm user location, IP address, user agent, is this in context with the users normal behavior? If deemed a true positive immediately reset user password and remove all user sessions. Enable number matching for MFA to mitigate this vulnerability.
 #### Additional Resources
 [Alerting and Detection Strategy Framework | by Palantir | Palantir Blog](https://blog.palantir.com/alerting-and-detection-strategy-framework-52dc33722df2)
 [Sign-in log schema in Azure Monitor - Microsoft Entra | Microsoft Learn](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/reference-azure-monitor-sign-ins-log-schema)
