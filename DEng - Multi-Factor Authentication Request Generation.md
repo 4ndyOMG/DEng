@@ -9,8 +9,10 @@ Fatigue can be defined as *weakness in metal or other materials caused by repeat
 
 ## Threat
 **Intent**. Many adversary groups have used this method to gain access to valid credentials. Mitre ATT&CK lists two groups using this technique [APT29](https://attack.mitre.org/groups/G0016) and [LAPSUS$](https://attack.mitre.org/groups/G1004)
-\n**Opportunity**. Organisations that have adopted MFA without number matching are vulnerable to this attack providing opportunity to the adversary. 
-\n**Capability**. The exploitation of MFA fatigue in Azure AD would be simple for any adversary to implement.
+
+**Opportunity**. Organisations that have adopted MFA without number matching are vulnerable to this attack providing opportunity to the adversary. 
+
+**Capability**. The exploitation of MFA fatigue in Azure AD would be simple for any adversary to implement.
 
 ## Data Source
 Azure AD Sign-in logs are required to detect MFA Fatigue against Azure AD. The particular fields of interest to detect MFA Fatigue are; ResultType, CorrelationId and Authentication details. Azure AD Sigin-in schema defines these fields as:
