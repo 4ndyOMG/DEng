@@ -16,8 +16,11 @@ Fatigue can be defined as *weakness in metal or other materials caused by repeat
 
 ## Data Source
 Azure AD Sign-in logs are required to detect MFA Fatigue against Azure AD. The particular fields of interest to detect MFA Fatigue are; ResultType, CorrelationId and Authentication details. Azure AD Sigin-in schema defines these fields as:
+
 **ResultType** - The result of the sign-in operation can be 0 for success or an error code for failure.
+
 **Correlation ID** - The correlation ID groups sign-ins from the same sign-in session. The identifier was implemented for convenience. Its accuracy is not guaranteed because the value is based on parameters passed by a client.
+
 **Authentication Details** provides the following information for each authentication attempt:
 - A list of authentication policies applied, such as Conditional Access or Security Defaults.
 - A list of session lifetime policies applied, such as Sign-in frequency or Remember MFA.
