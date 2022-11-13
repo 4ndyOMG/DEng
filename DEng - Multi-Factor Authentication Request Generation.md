@@ -29,9 +29,9 @@ This information allows you to troubleshoot each step in a user’s sign-in. Use
 - How frequently authentication requirements are satisfied by token claims, such as when users aren't interactively prompted to enter a password or enter an SMS OTP.
 
 The ResultTypes of interest are:
-	- 50074 - User did not pass the MFA challenge.
-	- 0 - Success
-	- 50140 - This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.
+- 50074 - User did not pass the MFA challenge.
+- 0 - Success
+- 50140 - This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.
 
 ### Goal
 This detection is to identify adversaries that have successfully exploited users through MFA Fatigue. 
