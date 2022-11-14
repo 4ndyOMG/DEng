@@ -71,11 +71,13 @@ Confirm user location, IP address, user agent, is this in context with the users
 
 ~~~kql
 let lookback = ago(1d);
-let threshold = toscalar(SigninLogs
+let threshold = toscalar(
+SigninLogs
 | where TimeGenerated between (ago(7d)..ago(2d))
 | where AuthenticationDetails contains "MFA denied"
 | summarize _count= count() by CorrelationId
-| summarize _avgCount = avg(_count));
+| summarize threshold = avg(_count) * 2 * stdevp(_count)
+);
 SigninLogs
 | where TimeGenerated > lookback
 | where ResultType == 50074
@@ -89,6 +91,7 @@ SigninLogs
 ) on CorrelationId
 | extend _authDetails = todynamic(AuthenticationDetails)
 | mv-expand _authDetails
+| where _authDetails contains "MFA denied"
 | summarize count() by CorrelationId, TimeGenerated, UserPrincipalName, threshold = ['threshold']
 | where count_ > threshold
 ~~~
