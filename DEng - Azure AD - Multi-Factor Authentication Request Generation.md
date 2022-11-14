@@ -1,4 +1,4 @@
-# DEng - Multi-Factor Authentication Request Generation
+# DEng - Azure AD - Multi-Factor Authentication Request Generation
 
 ## Detection Requirement
 
