@@ -51,9 +51,10 @@ The detection first identifies the CorrelationId of all users that have failed a
 
 The authentication details are then expanded to a line for each event before filtering on only those event that contain MFA Deny. These events are the counted by the CorrelationID before being compared against the threshold.
 
-Please note that the amount of failures events through this expanded authentication details is expediential. The next event following the failure contains the authentication details of each failure and continues to record each failure until success. For example, an authentication request that passes MFA on the third attempt would generate 5 events; 1 on the first failure and 2 for the second fail and 2 again on success (the first failure and the second). An authentication request that passes MFA on the forth attempt would generate 9 events in this analytic.
+Please note the next event following the failure contains the authentication details of each failure and continues to record each failure until success. This analytic uses dcount() to count the number of distinct values to be compared against the threshold. 
 
-The threshold is built by counting the number of events seen with the authentication details that contain MFA denied. The threshold does not expand the events and performs a 1:1 count on the CorrelationId. An average is then taken from the count of failures per CorrelationId over the past week and used as the threshold. The benefit of a behavioral threshold is that it will move with the users behaviour keeping the threshold a as low as possible without false positives.
+The threshold is a static number set by the detection engineer. This threshold should be refined to each Azure Directory to reduce false positive whilst preventing false negatives which is known as detection precision. 
+
 ### Blind Spots and Assumptions
 It is assumed that the adversary will send all MFA attempts in a single session. 
 ### False Positives
@@ -68,16 +69,11 @@ Confirm user location, IP address, user agent, is this in context with the users
 [Alerting and Detection Strategy Framework | by Palantir | Palantir Blog](https://blog.palantir.com/alerting-and-detection-strategy-framework-52dc33722df2)
 [Sign-in log schema in Azure Monitor - Microsoft Entra | Microsoft Learn](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/reference-azure-monitor-sign-ins-log-schema)
 [join operator - Azure Data Explorer | Microsoft Learn](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/joinoperator?pivots=azuredataexplorer)
+https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/dcount-aggfunction
 
 ~~~kql
 let lookback = ago(1d);
-let threshold = toscalar(
-SigninLogs
-| where TimeGenerated between (ago(7d)..ago(2d))
-| where AuthenticationDetails contains "MFA denied"
-| summarize _count= count() by CorrelationId
-| summarize threshold = avg(_count) * 2 * stdevp(_count)
-);
+let threshold = 5;
 SigninLogs
 | where TimeGenerated > lookback
 | where ResultType == 50074
@@ -91,7 +87,6 @@ SigninLogs
 ) on CorrelationId
 | extend _authDetails = todynamic(AuthenticationDetails)
 | mv-expand _authDetails
-| where _authDetails contains "MFA denied"
-| summarize count() by CorrelationId, TimeGenerated, UserPrincipalName, threshold = ['threshold']
-| where count_ > threshold
+| summarize dcount(tostring(_authDetails)) by CorrelationId, UserPrincipalName
+| where dcount__authDetails > threshold
 ~~~
