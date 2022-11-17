@@ -87,6 +87,7 @@ SigninLogs
 ) on CorrelationId
 | extend _authDetails = todynamic(AuthenticationDetails)
 | mv-expand _authDetails
+| where _authDetails contains "MFA denied"
 | summarize dcount(tostring(_authDetails)) by CorrelationId, UserPrincipalName
 | where dcount__authDetails > threshold
 ~~~
