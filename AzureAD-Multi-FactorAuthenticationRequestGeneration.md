@@ -64,7 +64,7 @@ Validated against basic testing in Azure AD.
 ### Priority
 High
 #### Response
-Confirm user location, IP address, user agent, is this in context with the users normal behavior? If deemed a true positive immediately reset user password and remove all user sessions. Enable number matching for MFA to mitigate this vulnerability.
+Confirm user location, IP address, user agent, is this in context with the users normal behaviour? If deemed a true positive immediately reset user password and remove all user sessions. Enable number matching for MFA to mitigate this vulnerability.
 #### Additional Resources
 [Alerting and Detection Strategy Framework | by Palantir | Palantir Blog](https://blog.palantir.com/alerting-and-detection-strategy-framework-52dc33722df2)
 [Sign-in log schema in Azure Monitor - Microsoft Entra | Microsoft Learn](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/reference-azure-monitor-sign-ins-log-schema)
